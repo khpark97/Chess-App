@@ -26,6 +26,8 @@ def get_best_moves(fen: str, num_moves: int = 3) -> List[dict]:
         if not engine.is_fen_valid(fen):
             return [{"error": "Invalid FEN"}]
         engine.set_fen_position(fen)
+
+        # Returns the top num_moves
         moves = engine.get_top_moves(num_moves)
         return moves
 
