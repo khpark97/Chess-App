@@ -4,7 +4,7 @@ import { Chess } from 'chess.js';
 
 export default function App() {
   const [game, setGame] = useState(new Chess());
-  const [bestMoves, setBestMoves] = useState<Array<{ Move: string, Centipawn: number | null, Mate: number | null }>>([]);
+  const [bestMoves, setBestMoves] = useState<Array<{ move: string, score: number | string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Memoized fetch function
@@ -13,7 +13,7 @@ export default function App() {
     try {
       const response = await fetch(`/api/analyze/?fen=${encodeURIComponent(fen)}`);
       const data = await response.json();
-      setBestMoves(data["moves"] || []);
+      setBestMoves(data || []);
     } catch (error) {
       console.error('Analysis failed:', error);
       setBestMoves([]);
@@ -62,23 +62,32 @@ export default function App() {
           <p>Calculating...</p>
         ) : (
           <ol>
-            {[...bestMoves]
-              .sort((a, b) => {
-                // Handle mate scores (they should be at the top)
-                if (a.Mate !== null && b.Mate !== null) return a.Mate - b.Mate;
-                if (a.Mate !== null) return -1;
-                if (b.Mate !== null) return 1;
-                // Sort by Centipawn if both moves have Centipawn values
-                return (b.Centipawn ?? 0) - (a.Centipawn ?? 0);
-              })
-              .map((m, index) => (
-                <li key={index}>
-                  {m.Move} -
-                  {m.Centipawn !== null
-                    ? ` ${m.Centipawn / 100}`
-                    : ` Mate in ${m.Mate!}`}
+            {[...bestMoves].map((m, index) => {
+              // Determine whose turn it is: 'w' for white, 'b' for black
+              const turn = game.turn();
+              const bgColor = turn === 'w' ? '#ffffff' : '#000000';
+              const color = turn === 'w' ? '#000000' : '#ffffff';
+              return (
+                <li key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      background: bgColor,
+                      color,
+                      borderRadius: '6px',
+                      padding: '2px 8px',
+                      fontWeight: 600,
+                      fontFamily: 'monospace',
+                      display: 'inline-block',
+                      minWidth: '32px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {m.score}
+                  </span>
+                  {m.move}
                 </li>
-              ))}
+              );
+            })}
           </ol>
         )}
         <button

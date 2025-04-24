@@ -14,7 +14,17 @@ def analyze_position(request):
     
     try:
         moves = get_best_moves(fen)
+        board = chess.Board(fen)
+        result = []
+        for i, m in enumerate(moves):
+            result.append({'move': m['Move'], 'score': m['Centipawn']})
+            result[i]['move'] = board.san(chess.Move.from_uci(m['Move']))
 
-        return Response({'moves': moves})  # Return the full analysis
+            if m['Centipawn'] is not None:
+                result[i]['score'] = m['Centipawn'] / 100
+            else:
+                result[i]['score'] = f"Mate in {m['Mate']}"
+        
+        return Response(result)  # Return the full analysis
     except Exception as e:
         return Response({'error': str(e)}, status=500)

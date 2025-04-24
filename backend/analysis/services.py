@@ -2,7 +2,6 @@ from typing import List
 from django.conf import settings
 import os
 
-import chess
 import stockfish
 
 def get_best_moves(fen: str, num_moves: int = 3) -> List[dict]:
@@ -30,9 +29,6 @@ def get_best_moves(fen: str, num_moves: int = 3) -> List[dict]:
 
         # Returns the top num_moves
         moves = engine.get_top_moves(num_moves)
-        board = chess.Board(fen)
-        for i, m in enumerate(moves):
-            moves[i]['Move'] = board.san(chess.Move.from_uci(m['Move']))
         return moves
 
     except stockfish.StockfishException as e:
