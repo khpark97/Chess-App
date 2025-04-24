@@ -27,6 +27,6 @@ router.register("games", GameViewSet, basename="games")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('router.urls')),  
+    path('api/', include(router.urls)),  
     path('api/analyze/', analyze_position)
 ]
