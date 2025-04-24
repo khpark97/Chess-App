@@ -1,0 +1,56 @@
+.header {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+}
+
+.moveList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.moveItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.moveText {
+    font-family: 'Chess Merida', monospace;
+    font-size: 1.1rem;
+}
+
+.scoreBox {
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: 600;
+    font-family: monospace;
+    min-width: 60px;
+    text-align: center;
+}
+
+.scoreWhite {
+    background: #ffffff;
+    color: #000000;
+}
+
+.scoreBlack {
+    background: #000000;
+    color: #ffffff;
+}
+
+.resetButton {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.resetButton:hover {
+    background: #555;
+}

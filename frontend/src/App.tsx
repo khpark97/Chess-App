@@ -1,19 +1,38 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
+import Board from './components/Board/Board';
+import Analysis from './components/Analysis/Analysis';
+import GameOver from './components/GameOver/GameOver';
+import './App.css';
+import type { Move, GameOverState } from './types.ts';
 
 export default function App() {
   const [game, setGame] = useState(new Chess());
-  const [bestMoves, setBestMoves] = useState<Array<{ move: string, score: number | string }>>([]);
+  const [bestMoves, setBestMoves] = useState<Move[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [gameOver, setGameOver] = useState<GameOverState>({
+    isOver: false,
+    result: null,
+    winner: null
+  });
 
-  // Memoized fetch function
   const fetchBestMoves = useCallback(async (fen: string) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/analyze/?fen=${encodeURIComponent(fen)}`);
       const data = await response.json();
-      setBestMoves(data || []);
+
+      if (data.game_over) {
+        setGameOver({
+          isOver: true,
+          result: data.result,
+          winner: data.winner
+        });
+        setBestMoves([]);
+      } else {
+        setGameOver({ isOver: false, result: null, winner: null });
+        setBestMoves(data.moves || []);
+      }
     } catch (error) {
       console.error('Analysis failed:', error);
       setBestMoves([]);
@@ -22,10 +41,9 @@ export default function App() {
     }
   }, []);
 
-  // Fetch moves when FEN changes
   const currentFen = game.fen();
   useEffect(() => {
-    fetchBestMoves(currentFen);
+    fetchBestMoves(game.fen());
   }, [currentFen, fetchBestMoves, game]);
 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
@@ -37,7 +55,7 @@ export default function App() {
       });
 
       if (move) {
-        setGame(new Chess(game.fen())); // Create new instance to trigger re-render
+        setGame(new Chess(game.fen()));
         return true;
       }
     } catch (e) {
@@ -47,58 +65,32 @@ export default function App() {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
-      <div style={{ width: '500px' }}>
-        <Chessboard
-          position={game.fen()}
-          onPieceDrop={onDrop}
-          boardWidth={500}
-        />
-      </div>
-
-      <div style={{ minWidth: '200px' }}>
-        <h3>Engine Analysis</h3>
-        {isLoading ? (
-          <p>Calculating...</p>
-        ) : (
-          <ol>
-            {[...bestMoves].map((m, index) => {
-              // Determine whose turn it is: 'w' for white, 'b' for black
-              const turn = game.turn();
-              const bgColor = turn === 'w' ? '#ffffff' : '#000000';
-              const color = turn === 'w' ? '#000000' : '#ffffff';
-              return (
-                <li key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span
-                    style={{
-                      background: bgColor,
-                      color,
-                      borderRadius: '6px',
-                      padding: '2px 8px',
-                      fontWeight: 600,
-                      fontFamily: 'monospace',
-                      display: 'inline-block',
-                      minWidth: '32px',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {m.score}
-                  </span>
-                  {m.move}
-                </li>
-              );
-            })}
-          </ol>
-        )}
-        <button
-          onClick={() => {
-            setGame(new Chess()) // Reset board
+    <div className="app-container">
+      {gameOver.isOver && gameOver.result && (
+        <GameOver
+          result={gameOver.result}
+          winner={gameOver.winner}
+          onNewGame={() => {
+            setGame(new Chess());
+            setGameOver({ isOver: false, result: null, winner: null });
           }}
-          style={{ marginTop: '10px' }}
-        >
-          Reset Board
-        </button>
-      </div>
+        />
+      )}
+
+      <Board
+        position={game.fen()}
+        onPieceDrop={onDrop}
+      />
+
+      <Analysis
+        moves={bestMoves}
+        isLoading={isLoading}
+        currentTurn={game.turn()}
+        onReset={() => {
+          setGame(new Chess());
+          setGameOver({ isOver: false, result: null, winner: null });
+        }}
+      />
     </div>
   );
 }

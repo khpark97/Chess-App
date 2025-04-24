@@ -5,6 +5,9 @@ __pycache__/
 *.sqlite3
 .env
 
+# test file
+test.py
+
 # React
 node_modules/
 .cache/
