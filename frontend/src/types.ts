@@ -9,6 +9,6 @@ export interface GameOverState {
 }
 
 export interface Move {
-    move: string;
+    san: string;
     score: number | string;
 }

@@ -8,3 +8,23 @@
     aspect-ratio: 1;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+.flipButton {
+    margin-top: 16px;
+    outline: solid;
+    padding: 8px 16px;
+    background: #000000;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    align-self: center;
+    /* Centers the button horizontally */
+    width: fit-content;
+}
+
+.flipButton:hover {
+    background: #444141;
+    border-color: #999;
+}
