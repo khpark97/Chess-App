@@ -2,6 +2,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .services import get_best_moves
+from games.models import Game
 
 import chess
 
@@ -27,6 +28,14 @@ def analyze_position(request):
             return Response({
                 'game_over': True,
                 'result': 'stalemate',
+                'winner': None,
+                'moves': []
+            })
+            
+        if board.is_insufficient_material():
+            return Response({
+                'game_over': True,
+                'result': 'insufficient',
                 'winner': None,
                 'moves': []
             })

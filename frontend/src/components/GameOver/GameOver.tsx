@@ -13,7 +13,11 @@ export default function GameOver({ result, winner, onNewGame }: Props) {
             <h2>
                 {result === "checkmate"
                     ? `Checkmate! ${winner?.toUpperCase()} wins!`
-                    : "Stalemate!"}
+                    : result === "stalemate"
+                        ? "Stalemate!"
+                        : result === "insufficient"
+                            ? "Draw by insufficient material!"
+                            : ""}
             </h2>
             <button className={styles.button} onClick={onNewGame}>
                 New Game
